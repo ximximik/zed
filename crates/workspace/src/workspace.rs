@@ -50,9 +50,9 @@ use gpui::{
     Action, AnyEntity, AnyView, AnyWeakView, App, AsyncApp, AsyncWindowContext, Bounds, Context,
     CursorStyle, Decorations, DragMoveEvent, Entity, EntityId, EventEmitter, FocusHandle,
     Focusable, Global, HitboxBehavior, Hsla, KeyContext, Keystroke, ManagedView, MouseButton,
-    PathPromptOptions, Point, PromptLevel, Render, ResizeEdge, Size, Stateful, Subscription,
-    SystemWindowTabController, Task, Tiling, WeakEntity, WindowBounds, WindowHandle, WindowId,
-    WindowOptions, actions, canvas, point, relative, size, transparent_black,
+    PathPromptOptions, Point, PromptLevel, Render, ResizeEdge, Size, Stateful, StyledImage,
+    Subscription, SystemWindowTabController, Task, Tiling, WeakEntity, WindowBounds, WindowHandle,
+    WindowId, WindowOptions, actions, canvas, point, relative, size, transparent_black,
 };
 pub use history_manager::*;
 pub use item::{
@@ -7359,6 +7359,7 @@ impl Render for Workspace {
             .iter()
             .map(|(_, notification)| notification.entity_id())
             .collect::<Vec<_>>();
+        let background_image = WorkspaceSettings::get_global(cx).background_image.clone();
         let bottom_dock_layout = WorkspaceSettings::get_global(cx).bottom_dock_layout;
 
         self.actions(div(), window, cx)
@@ -7399,6 +7400,15 @@ impl Render for Workspace {
                                 .border_t_1()
                                 .border_b_1()
                                 .border_color(colors.border)
+                                .when_some(background_image.clone(), |this, background_image| {
+                                    this.child(
+                                        gpui::img(std::path::PathBuf::from(background_image.file))
+                                            .absolute()
+                                            .size_full()
+                                            .object_fit(background_image.fit.into_gpui())
+                                            .opacity(background_image.opacity),
+                                    )
+                                })
                                 .child({
                                     let this = cx.entity();
                                     canvas(

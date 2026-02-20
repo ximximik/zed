@@ -194,6 +194,18 @@
   //
   // Default: "client"
   "window_decorations": "client",
+  // Background image rendered behind the workspace UI.
+  //
+  // Example:
+  // "background_image": {
+  //   "file": "/absolute/path/to/image.png",
+  //   "opacity": 0.35,
+  //   "fit": "cover"
+  // },
+  //
+  // `opacity` is clamped to [0.0, 1.0].
+  // `fit` can be one of: "fill", "contain", "cover", "scale_down", "none".
+  "background_image": null,
   // Whether to use the system provided dialogs for Open and Save As.
   // When set to false, Zed will use the built-in keyboard-first pickers.
   "use_system_path_prompts": true,
