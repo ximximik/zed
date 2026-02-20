@@ -2,6 +2,7 @@ use std::num::NonZeroUsize;
 
 use crate::DockPosition;
 use collections::HashMap;
+use gpui::ObjectFit;
 use serde::Deserialize;
 pub use settings::{
     AutosaveSetting, BottomDockLayout, EncodingDisplayOptions, InactiveOpacity,
@@ -12,6 +13,7 @@ pub use settings::{
 #[derive(RegisterSetting)]
 pub struct WorkspaceSettings {
     pub active_pane_modifiers: ActivePanelModifiers,
+    pub background_image: Option<BackgroundImageSettings>,
     pub bottom_dock_layout: settings::BottomDockLayout,
     pub pane_split_direction_horizontal: settings::PaneSplitDirectionHorizontal,
     pub pane_split_direction_vertical: settings::PaneSplitDirectionVertical,
@@ -35,6 +37,46 @@ pub struct WorkspaceSettings {
     pub use_system_window_tabs: bool,
     pub zoomed_padding: bool,
     pub window_decorations: settings::WindowDecorations,
+}
+
+#[derive(Clone, PartialEq, Debug)]
+pub struct BackgroundImageSettings {
+    pub file: String,
+    pub opacity: f32,
+    pub fit: BackgroundImageFit,
+}
+
+#[derive(Copy, Clone, PartialEq, Debug)]
+pub enum BackgroundImageFit {
+    Fill,
+    Contain,
+    Cover,
+    ScaleDown,
+    None,
+}
+
+impl BackgroundImageFit {
+    pub fn into_gpui(self) -> ObjectFit {
+        match self {
+            Self::Fill => ObjectFit::Fill,
+            Self::Contain => ObjectFit::Contain,
+            Self::Cover => ObjectFit::Cover,
+            Self::ScaleDown => ObjectFit::ScaleDown,
+            Self::None => ObjectFit::None,
+        }
+    }
+}
+
+impl From<settings::BackgroundImageFit> for BackgroundImageFit {
+    fn from(value: settings::BackgroundImageFit) -> Self {
+        match value {
+            settings::BackgroundImageFit::Fill => Self::Fill,
+            settings::BackgroundImageFit::Contain => Self::Contain,
+            settings::BackgroundImageFit::Cover => Self::Cover,
+            settings::BackgroundImageFit::ScaleDown => Self::ScaleDown,
+            settings::BackgroundImageFit::None => Self::None,
+        }
+    }
 }
 
 #[derive(Copy, Clone, PartialEq, Debug, Default)]
@@ -84,6 +126,16 @@ impl Settings for WorkspaceSettings {
                         .unwrap(),
                 ),
             },
+            background_image: workspace
+                .background_image
+                .as_ref()
+                .and_then(|background_image| {
+                    let file = background_image.file.as_ref()?.to_owned();
+                    let opacity = background_image.opacity.unwrap_or(1.0).clamp(0.0, 1.0);
+                    let fit = background_image.fit.unwrap_or_default().into();
+
+                    Some(BackgroundImageSettings { file, opacity, fit })
+                }),
             bottom_dock_layout: workspace.bottom_dock_layout.unwrap(),
             pane_split_direction_horizontal: workspace.pane_split_direction_horizontal.unwrap(),
             pane_split_direction_vertical: workspace.pane_split_direction_vertical.unwrap(),

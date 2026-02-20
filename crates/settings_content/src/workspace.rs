@@ -122,6 +122,47 @@ pub struct WorkspaceSettingsContent {
     /// What draws window decorations/titlebar, the client application (Zed) or display server
     /// Default: client
     pub window_decorations: Option<WindowDecorations>,
+    /// Optional background image rendered behind the workspace UI.
+    pub background_image: Option<BackgroundImageSettingsContent>,
+}
+
+#[with_fallible_options]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema, MergeFrom)]
+pub struct BackgroundImageSettingsContent {
+    /// Absolute path to an image file on disk.
+    pub file: Option<String>,
+    /// Opacity of the image from 0.0 to 1.0.
+    ///
+    /// Default: 1.0
+    #[serde(serialize_with = "serialize_optional_f32_with_two_decimal_places")]
+    pub opacity: Option<f32>,
+    /// How the image is resized within the workspace bounds.
+    ///
+    /// Default: cover
+    pub fit: Option<BackgroundImageFit>,
+}
+
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    PartialEq,
+    Default,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    MergeFrom,
+    strum::VariantArray,
+    strum::VariantNames,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum BackgroundImageFit {
+    Fill,
+    Contain,
+    #[default]
+    Cover,
+    ScaleDown,
+    None,
 }
 
 #[with_fallible_options]
