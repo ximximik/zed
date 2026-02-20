@@ -461,6 +461,9 @@ pub struct ThemeStyleContent {
     #[serde(rename = "background.appearance")]
     pub window_background_appearance: Option<WindowBackgroundContent>,
 
+    #[serde(rename = "background.image_file")]
+    pub background_image_file: Option<String>,
+
     #[serde(default)]
     pub accents: Vec<AccentContent>,
 

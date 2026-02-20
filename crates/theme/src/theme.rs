@@ -288,6 +288,11 @@ impl ThemeFamily {
             .window_background_appearance
             .map(|w| w.into_gpui())
             .unwrap_or_default();
+        let background_image_file = theme
+            .style
+            .background_image_file
+            .clone()
+            .map(SharedString::from);
 
         Theme {
             id: uuid::Uuid::new_v4().to_string(),
@@ -296,6 +301,7 @@ impl ThemeFamily {
             styles: ThemeStyles {
                 system: SystemColors::default(),
                 window_background_appearance,
+                background_image_file,
                 accents: refined_accent_colors,
                 colors: refined_theme_colors,
                 status: refined_status_colors,
@@ -397,6 +403,12 @@ impl Theme {
     #[inline(always)]
     pub fn window_background_appearance(&self) -> WindowBackgroundAppearance {
         self.styles.window_background_appearance
+    }
+
+    /// Returns the configured background image path for the theme.
+    #[inline(always)]
+    pub fn background_image_file(&self) -> Option<SharedString> {
+        self.styles.background_image_file.clone()
     }
 
     /// Darkens the color by reducing its lightness.

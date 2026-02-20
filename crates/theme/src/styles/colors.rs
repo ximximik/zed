@@ -592,6 +592,8 @@ pub fn all_theme_colors(cx: &mut App) -> Vec<(Hsla, SharedString)> {
 pub struct ThemeStyles {
     /// The background appearance of the window.
     pub window_background_appearance: WindowBackgroundAppearance,
+    /// Optional file path to an image that should be rendered behind the app UI.
+    pub background_image_file: Option<SharedString>,
     pub system: SystemColors,
     /// An array of colors used for theme elements that iterate through a series of colors.
     ///

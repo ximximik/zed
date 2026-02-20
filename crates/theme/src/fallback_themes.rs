@@ -108,6 +108,7 @@ pub(crate) fn zed_default_dark() -> Theme {
         appearance: Appearance::Dark,
         styles: ThemeStyles {
             window_background_appearance: WindowBackgroundAppearance::Opaque,
+            background_image_file: None,
             system: SystemColors::default(),
             accents: AccentColors(vec![blue, orange, purple, teal, red, green, yellow]),
             colors: ThemeColors {
