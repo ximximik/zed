@@ -2,8 +2,8 @@ use anyhow::Result;
 use feature_flags::{AgentV2FeatureFlag, FeatureFlagAppExt};
 use gpui::{
     AnyView, App, Context, DragMoveEvent, Entity, EntityId, EventEmitter, FocusHandle, Focusable,
-    ManagedView, MouseButton, Pixels, Render, Subscription, Task, Tiling, Window, WindowId,
-    actions, deferred, px,
+    ManagedView, MouseButton, ObjectFit, Pixels, Render, Subscription, Task, Tiling, Window,
+    WindowId, actions, deferred, img, px,
 };
 use project::Project;
 use std::future::Future;
@@ -673,10 +673,46 @@ impl Render for MultiWorkspace {
             None
         };
 
+        let background_image = cx
+            .theme()
+            .background_image_file()
+            .map(|background_image_file| {
+                div()
+                    .absolute()
+                    .top_0()
+                    .left_0()
+                    .right_0()
+                    .bottom_0()
+                    .child(
+                        img(background_image_file)
+                            .size_full()
+                            .object_fit(ObjectFit::Cover),
+                    )
+                    .into_any_element()
+            });
+
         client_side_decorations(
-            h_flex()
+            div()
                 .key_context("Workspace")
                 .size_full()
+                .relative()
+                .children(background_image)
+                .child(
+                    h_flex()
+                        .size_full()
+                        .when(
+                            self.sidebar_open() && self.multi_workspace_enabled(cx),
+                            |this| this.children(sidebar),
+                        )
+                        .child(
+                            div()
+                                .flex()
+                                .flex_1()
+                                .size_full()
+                                .overflow_hidden()
+                                .child(self.workspace().clone()),
+                        ),
+                )
                 .on_action(
                     cx.listener(|this: &mut Self, _: &NewWorkspaceInWindow, window, cx| {
                         this.create_workspace(window, cx);
@@ -713,16 +749,7 @@ impl Render for MultiWorkspace {
                                 }
                             },
                         ))
-                        .children(sidebar)
                     },
-                )
-                .child(
-                    div()
-                        .flex()
-                        .flex_1()
-                        .size_full()
-                        .overflow_hidden()
-                        .child(self.workspace().clone()),
                 ),
             window,
             cx,

@@ -559,6 +559,9 @@ impl ThemeSettings {
             base_theme.styles.window_background_appearance =
                 window_background_appearance.into_gpui();
         }
+        if let Some(background_image_file) = &theme_overrides.background_image_file {
+            base_theme.styles.background_image_file = Some(background_image_file.clone().into());
+        }
         let status_color_refinement = status_colors_refinement(&theme_overrides.status);
 
         base_theme.styles.colors.refine(&theme_colors_refinement(
